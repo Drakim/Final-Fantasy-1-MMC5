@@ -5,9 +5,9 @@
 .import DrawComplexString_L, DrawBox_L, UpdateJoy_L, DrawPalette_L
 .import WaitForVBlank_L, lut_RNG
 
-.include "variables.inc"
-.include "Constants.inc"
-.include "macros.inc"
+.include "src/variables.inc"
+.include "src/constants.inc"
+.include "src/macros.inc"
 
 BANK_THIS = $0D
 

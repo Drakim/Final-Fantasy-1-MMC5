@@ -1,1 +1,2 @@
-Patches/
+build/*.o
+build/*.nes

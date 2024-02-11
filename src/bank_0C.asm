@@ -1,6 +1,6 @@
-.include "variables.inc"
-.include "macros.inc"
-.include "Constants.inc"
+.include "src/variables.inc"
+.include "src/macros.inc"
+.include "src/constants.inc"
 
 .export lut_BattlePalettes, BankC_CrossBankJumpList
 
@@ -58,7 +58,7 @@ lut_ArmorData:
 ;;      $1A enemy attacks   ($D0 bytes)
 ;;  = $2E0 bytes total
 ;;
-;;    see MAGDATA constants in Constants.inc for layout description
+;;    see MAGDATA constants in constants.inc for layout description
 
 lut_MagicData:
     .INCBIN "bin/0C_81E0_magicdata.bin"
@@ -71,7 +71,7 @@ lut_MagicData:
 ;;  Each entry indicates which battle message to print when the spell connects with its target.
 ;;  A value of 0 indicates no message should be printed.
 ;;
-;;    The values themselves match BTLMSG_XXXX names in Constants.inc
+;;    The values themselves match BTLMSG_XXXX names in constants.inc
 
 lut_MagicBattleMessages:
   .BYTE $01, $00, $02, $03,  $00, $00, $05, $00,    $00, $00, $08, $03,  $00, $00, $0A, $0B     ; spells
@@ -96,7 +96,7 @@ lut_MagicBattleMessages:
 ;;  $80 Enemies * $14 bytes per enemy
 ;;    = $A00 bytes of data
 ;;
-;;  See ENROMSTAT_xxx constants in Constants.inc for layout
+;;  See ENROMSTAT_xxx constants in constants.inc for layout
 
 data_EnemyStats:
   .INCBIN "bin/0C_8520_enemydata.bin"

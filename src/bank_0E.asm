@@ -1,6 +1,6 @@
-.include "variables.inc"
-.include "macros.inc"
-.include "Constants.inc"
+.include "src/variables.inc"
+.include "src/macros.inc"
+.include "src/constants.inc"
 
 .export PrintNumber_2Digit, PrintPrice, PrintCharStat, PrintGold
 .export TalkToObject, EnterLineupMenu, NewGamePartyGeneration

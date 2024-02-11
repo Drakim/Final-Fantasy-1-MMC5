@@ -1,5 +1,5 @@
-.include "Constants.inc"
-.include "variables.inc"
+.include "src/constants.inc"
+.include "src/variables.inc"
 
 
 .export EnterMinimap

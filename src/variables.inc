@@ -203,7 +203,7 @@ btlsfxnse_ptr       = $9E
 
 
   ; for sound channels (between Bx-Dx)
-  ;  see Constants.inc
+  ;  see constants.inc
   ch_scoreptr   = $0
   ch_envptr     = $2  ; ptr to start of env data
   ch_envpos     = $4  ; pos in env data (00-1F)

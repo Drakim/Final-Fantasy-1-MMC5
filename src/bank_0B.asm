@@ -1,6 +1,6 @@
-.include "variables.inc"
-.include "macros.inc"
-.include "Constants.inc"
+.include "src/variables.inc"
+.include "src/macros.inc"
+.include "src/constants.inc"
 
 .export data_EnemyNames, PrepBattleVarsAndEnterBattle_L, lut_BattleRates, lut_BattleFormations, data_BattleMessages
 .export BattleOver_ProcessResult_L

@@ -1,6 +1,6 @@
-.include "Constants.inc"
-.include "variables.inc"
-.include "macros.inc"
+.include "src/constants.inc"
+.include "src/variables.inc"
+.include "src/macros.inc"
 
 .export GameStart_L
 
