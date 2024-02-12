@@ -13829,32 +13829,6 @@ BattleRNG:
     
     
 WaitForVBlank_L: JMP WaitForVBlank
-SwapPRG_L:       JMP SwapPRG
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;;  SetMMC1SwapMode  [$FE06 :: 0x3FE16]
-;;
-;;   Sets current MMC1 swap/mirroring modes
-;;
-;;  IN:   A = desired mode
-;;
-;;  OUT:  A = A>>4
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-SetMMC1SwapMode:
-    STA $9FFF    ; MMC1 registers must be written to 1 bit at a time
-    LSR A        ;  low bit first
-    STA $9FFF    ; To accomplish this, you write, then shift,
-    LSR A        ; then write, then shift.. etc.  5 writes total
-    STA $9FFF
-    LSR A
-    STA $9FFF
-    LSR A
-    STA $9FFF
-    RTS
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -13868,17 +13842,14 @@ SetMMC1SwapMode:
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SwapPRG:
-    STA $FFF9    ; same deal as SetMMC1SwapMode.. write/shift/write...
-    LSR A
-    STA $FFF9
-    LSR A
-    STA $FFF9
-    LSR A
-    STA $FFF9
-    LSR A
-    STA $FFF9
-    RTS
+SwapPRG_L:  
+SwapPRG:  
+  STA actual_bank ; JIGS - see LongCall 
+  ASL A       ; Double the page number (MMC5 uses 8K pages, but FF1 uses 16K pages)
+  ORA #$80    ; Turn on the high bit to indicate we want ROM and not RAM
+  STA $5115   ; Swap to the desired page
+  LDA #0      ; IIRC Some parts of FF1 expect A to be zero when this routine exits
+  RTS    
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -13891,10 +13862,21 @@ SwapPRG:
 
 OnReset:
     SEI            ; Set Interrupt flag (prevent IRQs from occuring)
-    LDA #0
+   
+    LDA #0    
+    LDX #0
+   @ResetRAM:
+    STA $0000, X
+    STA $0200, X
+    STA $0300, X
+    STA $0400, X
+    STA $0500, X
+    STA $0600, X
+    STA $0700, X
+    INX
+    BNE @ResetRAM
+
     STA $2000      ; Disable NMIs
-    STA soft2000
-    STA unk_FE     ; clear some PPU related areas in RAM
     LDA #$06
     STA $2001      ; disable Spr/BG rendering (shut off PPU)
     CLD            ; clear Decimal flag (just a formality, doesn't really do anything)
@@ -13906,43 +13888,36 @@ OnReset:
       DEX
       BNE @Loop
 
-    LDA #$80       ; reset the MMC1
-    STA $9FFF      ;  resets the latch used by register writes
-    STA $BFFF      ;  ensures that the next register write will be the first in the 5-write sequence
-    STA $DFFF
-    STA $FFF9
+    ; MMC5
+      
+    STX $5010      ; Disable MMC5 PCM and IRQs
+    STX $5204      ; Disable MMC5 scanline IRQs
+    STX $5130      ; Check doc on MMC5 to see what this does
+    STX $5113      ; swap battery-backed PRG RAM into $6000 page.     
+    STX $5200      ; disable split-screen mode
+    STX $5101      ; 8k CHR swap mode (no swapping)
+    STX $5127      ; Swap in first CHR Page
+    INX            ; 01
+    STX $5100      ; 16k PRG-RAM swap
+    STX $5103      ; Allow writing to PRG-RAM B  
+    INX            ; 02
+    STX $5102      ; Allow writing to PRG-RAM A
+    STX $5104      ; ExRAM mode Ex2   
+    LDX #$44
+    STX $5105      ; Vertical mirroring
+    LDX #$FF        
+    STX $5117
 
-    LDA #%00001110
-    JSR SetMMC1SwapMode ; Set MMC1's mirroring settings (Vert mirroring), and swap info
-
-    STA $BFFF      ; After that call, A will be 0
-    STA $BFFF      ;  having being shifted right 4 times.
-    STA $BFFF      ;  these writes clear out MMC1's other registers
-    STA $BFFF      ;  which aren't used for this game (like CHR-ROM stuff)
-    STA $BFFF
-    STA $DFFF      ; This is good practice even though it isn't really required.  A game
-    STA $DFFF      ;  should always set things to a known state.
-    STA $DFFF
-    STA $DFFF
-    STA $DFFF
-
-    LDA #$06
-    JSR SwapPRG    ; swap to bank 6 (pointless to do this here -- we do it again below)
-
+    LDA #0
     STA $4016      ; clear joypad strobe??  This seems like an odd place to do it since it doesn't read joy data here  =P
-    STA $4015      ; turn off all sound channels
+
     STA $4010      ; disble DMC IRQs
     LDA #$C0
     STA $4017      ; set alternative pAPU frame counter method, reset the frame counter, and disable APU IRQs
 
-    DEX            ; X was previously 0, this makes it FF
     TXS            ; transfer it to the Stack Pointer (resetting the SP)
-    STX unk_0100   ; ???
 
-    JSR ClearBGPalette ;  clear the BG palette
-
-    LDA #$06           ; swap to bank 6 again (even though we just did) .. but why?  We never use
-    JSR SwapPRG        ;   anything in bank 6
+    JSR DisableAPU
     JMP GameStart_L    ; jump to the start of the game!
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -13971,8 +13946,6 @@ OnNMI:
     PLA
     PLA            ; pull the RTI return info off the stack
     RTS            ; return to the game
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

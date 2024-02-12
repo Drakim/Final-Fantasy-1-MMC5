@@ -1,17 +1,15 @@
 Fork based on https://github.com/Entroper/FF1Disassembly
 
 Disch did all the work with dissasembling Final Fantasy 1 for the NES.
-This is a refresh and reorganization of the orginal repository, with
-the following changes:
+This is a MMC5 conversion of the game based on the cleanup at:
 
-* The nesheader.bin file has been replaced by nes2header.inc macros
+https://github.com/Drakim/Final-Fantasy-1-Disassembly
 
-* All binary files have been moved to the "bin" folder
+Combined with MMC5 changes from:
 
-* All binary files are now included though the use of .incbin
+https://github.com/JiggeryPonkery/FF1-MMC5
 
-* All .asm files have been moved to the "src" folder
+It's useful for romhacks which needs the extra features that the MMC5
+offers, which is well-documented over at:
 
-* nes.cfg has been updated to put all output in the "build" folder
-
-* Minor junk files have been deleted
+https://www.nesdev.org/wiki/MMC5

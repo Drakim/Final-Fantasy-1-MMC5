@@ -1,6 +1,6 @@
 .include "src/nes2header.inc"
 
-nes2mapper 1
+nes2mapper 5
 nes2prg 262144
 nes2chr 0
 nes2chrram 8192
